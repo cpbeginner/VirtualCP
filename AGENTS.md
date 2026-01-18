@@ -248,3 +248,12 @@ This file is an implementation log maintained by Codex per project requirements.
   - `git remote add origin https://github.com/cpbeginner/VirtualCP.git`
 - Result / issues:
   - Ready to push once a GitHub repo exists and credentials/token are provided.
+
+## Feature 19 - branch rename
+
+- Changes:
+  - Renamed the default branch to `main` to match GitHub defaults.
+- Commands run:
+  - `git branch -M main`
+- Result / issues:
+  - Local branch is now `main`.
