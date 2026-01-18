@@ -1,0 +1,54 @@
+{
+  "users": [
+    {
+      "id": "3e6ff503-bd36-4f07-bad4-738d2031aa1a",
+      "username": "Kriz_Wu",
+      "passwordHash": "$2a$10$dHY6XMeNfYh9pqvC2QXsJ.7NhHCFnu4uFeYLHap79aawVd2tuY8V.",
+      "cfHandle": "Kriz_Wu",
+      "atcoderUser": "Kriz_Wu",
+      "createdAt": 1768598144
+    }
+  ],
+  "contests": [
+    {
+      "id": "ca6d8f21-2db0-4333-970a-526f964e52c2",
+      "ownerUserId": "3e6ff503-bd36-4f07-bad4-738d2031aa1a",
+      "name": "Test",
+      "status": "running",
+      "createdAt": 1768598167,
+      "durationSeconds": 7200,
+      "seed": "130f0c31-d363-4043-b8d0-37bc01c9688f",
+      "problems": [
+        {
+          "platform": "codeforces",
+          "key": "1975A",
+          "name": "Yet Another A",
+          "url": "https://codeforces.com/contest/1975/problem/A",
+          "difficulty": 800,
+          "tags": [
+            "constructive algorithms"
+          ]
+        },
+        {
+          "platform": "atcoder",
+          "key": "abc302_a",
+          "name": "Attack",
+          "url": "https://atcoder.jp/contests/abc302/tasks/abc302_a",
+          "difficulty": 300
+        }
+      ],
+      "progress": {
+        "solved": {},
+        "lastPoll": {
+          "cfFrom": 1768598473,
+          "atFrom": 1768598290
+        },
+        "lastSync": {
+          "codeforces": 1768598473,
+          "atcoder": 1768598473
+        }
+      },
+      "startedAt": 1768598290
+    }
+  ]
+}

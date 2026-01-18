@@ -1,0 +1,18 @@
+{
+  "status": "OK",
+  "result": [
+    {
+      "id": 1001,
+      "creationTimeSeconds": 1700000100,
+      "verdict": "OK",
+      "problem": { "contestId": 1995, "index": "A" }
+    },
+    {
+      "id": 1002,
+      "creationTimeSeconds": 1700000200,
+      "verdict": "WRONG_ANSWER",
+      "problem": { "contestId": 1995, "index": "B" }
+    }
+  ]
+}
+

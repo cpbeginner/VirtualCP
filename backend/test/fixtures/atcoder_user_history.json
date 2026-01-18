@@ -1,0 +1,27 @@
+[
+  {
+    "IsRated": true,
+    "EndTime": "2023-01-01T12:00:00+09:00",
+    "OldRating": 0,
+    "NewRating": 400,
+    "Performance": 450,
+    "ContestName": "Mock ABC 1"
+  },
+  {
+    "IsRated": true,
+    "EndTime": "2023-02-01T12:00:00+09:00",
+    "OldRating": 400,
+    "NewRating": 550,
+    "Performance": 600,
+    "ContestName": "Mock ABC 2"
+  },
+  {
+    "IsRated": false,
+    "EndTime": "2023-03-01T12:00:00+09:00",
+    "OldRating": 550,
+    "NewRating": 550,
+    "Performance": 0,
+    "ContestName": "Mock (unrated)"
+  }
+]
+

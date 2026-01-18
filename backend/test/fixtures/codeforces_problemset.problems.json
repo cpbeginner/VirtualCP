@@ -1,0 +1,18 @@
+{
+  "status": "OK",
+  "result": {
+    "problems": [
+      { "contestId": 1995, "index": "A", "name": "Problem A", "rating": 800, "tags": ["implementation"] },
+      { "contestId": 1995, "index": "B", "name": "Problem B", "rating": 900, "tags": ["math"] },
+      { "contestId": 1995, "index": "C", "name": "Problem C", "rating": 1100, "tags": ["greedy"] },
+      { "contestId": 1995, "index": "D", "name": "Problem D", "rating": 1300, "tags": ["dp"] },
+      { "contestId": 1980, "index": "A", "name": "Another A", "rating": 800, "tags": ["strings"] },
+      { "contestId": 1980, "index": "B", "name": "Another B", "rating": 1000, "tags": ["implementation", "sortings"] },
+      { "contestId": 1975, "index": "A", "name": "Yet Another A", "rating": 800, "tags": ["constructive algorithms"] },
+      { "contestId": 1975, "index": "B", "name": "Yet Another B", "rating": 1000, "tags": ["math", "number theory"] },
+      { "contestId": 1960, "index": "A", "name": "Old A", "rating": 800, "tags": ["implementation"] },
+      { "contestId": 1960, "index": "B", "name": "Old B", "rating": 1200, "tags": ["graphs"] }
+    ]
+  }
+}
+

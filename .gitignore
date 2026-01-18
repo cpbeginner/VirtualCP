@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+.env.local
+.DS_Store
+
+backend/data/cache/*.json
+backend/data/cache/meta.json
+

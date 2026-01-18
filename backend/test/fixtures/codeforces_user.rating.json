@@ -1,0 +1,33 @@
+{
+  "status": "OK",
+  "result": [
+    {
+      "contestId": 1000,
+      "contestName": "Mock Contest 1",
+      "handle": "any",
+      "rank": 123,
+      "ratingUpdateTimeSeconds": 1690000000,
+      "oldRating": 0,
+      "newRating": 800
+    },
+    {
+      "contestId": 1001,
+      "contestName": "Mock Contest 2",
+      "handle": "any",
+      "rank": 111,
+      "ratingUpdateTimeSeconds": 1695000000,
+      "oldRating": 800,
+      "newRating": 950
+    },
+    {
+      "contestId": 1002,
+      "contestName": "Mock Contest 3",
+      "handle": "any",
+      "rank": 99,
+      "ratingUpdateTimeSeconds": 1700000000,
+      "oldRating": 950,
+      "newRating": 1020
+    }
+  ]
+}
+

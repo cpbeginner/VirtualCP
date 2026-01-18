@@ -1,0 +1,17 @@
+{
+  "name": "virtualcp",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm -w backend run dev\" \"npm -w frontend run dev\"",
+    "build": "npm -w backend run build && npm -w frontend run build",
+    "test": "npm -w backend run test",
+    "stress": "npm -w backend run stress"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
