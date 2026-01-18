@@ -237,3 +237,14 @@ This file is an implementation log maintained by Codex per project requirements.
   - `git config user.email "vuquoclam117@gmail.com"`
 - Result / issues:
   - Local repo initialized; awaiting remote URL/credentials to push.
+
+## Feature 18 - initial commit + remote setup
+
+- Changes:
+  - Committed the project state under the VirtualCP name and set the GitHub remote URL.
+- Commands run:
+  - `git add .`
+  - `git commit -m "Rename project to VirtualCP"`
+  - `git remote add origin https://github.com/cpbeginner/VirtualCP.git`
+- Result / issues:
+  - Ready to push once a GitHub repo exists and credentials/token are provided.
