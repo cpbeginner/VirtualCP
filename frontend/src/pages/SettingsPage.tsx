@@ -114,7 +114,7 @@ export function SettingsPage() {
   }, [cacheStatus.data]);
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 page-enter">
       <Card title="Profile / Handles">
         {profileMessage ? (
           <Alert variant={profileMessage.kind === "success" ? "info" : "error"} className="mb-4">

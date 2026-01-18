@@ -6,13 +6,13 @@ export function Badge(props: PropsWithChildren<{ variant?: Variant; className?: 
   const { variant = "neutral", className, children } = props;
   const variants: Record<Variant, string> = {
     neutral: "bg-[var(--secondary)] text-[var(--ink)]",
-    success: "bg-[rgba(30,122,74,0.12)] text-[var(--success)]",
-    warning: "bg-[rgba(191,122,0,0.16)] text-[var(--warning)]",
+    success: "bg-[rgba(27,138,90,0.14)] text-[var(--success)]",
+    warning: "bg-[rgba(246,174,45,0.18)] text-[var(--warning)]",
   };
   return (
     <span
       className={[
-        "inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em]",
+        "inline-flex items-center rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em]",
         variants[variant],
         className,
       ]

@@ -14,14 +14,14 @@ export function Button(
   const isDisabled = disabled || isLoading;
 
   const base =
-    "inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold tracking-tight transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold tracking-[0.12em] uppercase transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
   const variants: Record<Variant, string> = {
     primary:
-      "bg-[var(--primary)] text-[var(--primary-ink)] shadow-[0_10px_24px_rgba(10,107,90,0.25)] hover:-translate-y-0.5 focus:ring-[rgba(10,107,90,0.25)]",
+      "bg-[var(--primary)] text-[var(--primary-ink)] shadow-[0_16px_32px_rgba(31,111,139,0.28)] hover:-translate-y-0.5 hover:shadow-[0_18px_36px_rgba(31,111,139,0.35)] focus:ring-[rgba(31,111,139,0.25)]",
     secondary:
-      "bg-[var(--secondary)] text-[var(--ink)] shadow-[0_10px_24px_rgba(142,110,67,0.18)] hover:-translate-y-0.5 focus:ring-[rgba(142,110,67,0.2)]",
+      "bg-[var(--secondary)] text-[var(--ink)] shadow-[0_12px_28px_rgba(75,90,96,0.15)] hover:-translate-y-0.5 focus:ring-[rgba(75,90,96,0.18)]",
     danger:
-      "bg-[var(--danger)] text-white shadow-[0_10px_24px_rgba(214,74,58,0.25)] hover:-translate-y-0.5 focus:ring-[rgba(214,74,58,0.25)]",
+      "bg-[var(--danger)] text-white shadow-[0_12px_28px_rgba(209,73,91,0.3)] hover:-translate-y-0.5 focus:ring-[rgba(209,73,91,0.25)]",
   };
 
   return (

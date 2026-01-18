@@ -74,11 +74,31 @@ export function DashboardPage() {
   });
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-      <Card title="Create virtual contest">
-        <div className="mb-4 text-2xl font-semibold tracking-tight text-[var(--ink)] font-display">
-          Design a custom set
+    <div className="space-y-6 page-enter">
+      <div className="rounded-3xl border border-[var(--stroke)] bg-[var(--card)]/85 p-6 shadow-[0_20px_50px_var(--shadow)] backdrop-blur">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.35em] text-[var(--muted)]">
+              VirtualCP
+            </div>
+            <div className="mt-2 text-3xl font-semibold tracking-tight text-[var(--ink)] font-display">
+              Build a new contest arc
+            </div>
+            <div className="mt-2 text-sm text-[var(--muted)]">
+              Mix Codeforces and AtCoder problems with per-problem ranges.
+            </div>
+          </div>
+          <div className="rounded-2xl border border-[var(--stroke)] bg-[rgba(31,111,139,0.08)] px-4 py-3 text-sm text-[var(--muted)]">
+            Total contests: <span className="font-semibold text-[var(--ink)]">{contests.length}</span>
+          </div>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr_1fr]">
+        <Card title="Create virtual contest">
+          <div className="mb-4 text-2xl font-semibold tracking-tight text-[var(--ink)] font-display">
+            Design a custom set
+          </div>
         {error ? (
           <Alert variant="error" className="mb-4">
             {error}
@@ -160,7 +180,7 @@ export function DashboardPage() {
               </Button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 stagger">
               {problemSpecs.map((p, idx) => {
                 const minLabel = p.platform === "codeforces" ? "CF rating min" : "AT difficulty min";
                 const maxLabel = p.platform === "codeforces" ? "CF rating max" : "AT difficulty max";
@@ -252,42 +272,43 @@ export function DashboardPage() {
             Generate contest
           </Button>
         </form>
-      </Card>
+        </Card>
 
-      <Card title="Your contests">
-        <div className="mb-4 text-2xl font-semibold tracking-tight text-[var(--ink)] font-display">
-          Recent sessions
-        </div>
-        <Table headers={["Status", "Name", "Solved", "Created"]}>
-          {contests.map((c) => {
-            const solvedCount = Object.keys(c.progress.solved ?? {}).length;
-            const total = c.problems.length;
-            return (
-              <tr
-                key={c.id}
-                className="cursor-pointer transition hover:bg-[rgba(10,107,90,0.06)]"
-                onClick={() => navigate(`/contests/${c.id}`)}
-              >
-                <td className="px-3 py-3">{statusBadge(c.status)}</td>
-                <td className="px-3 py-3 font-medium text-[var(--ink)]">{c.name}</td>
-                <td className="px-3 py-3 text-[var(--muted)]">
-                  {solvedCount}/{total}
-                </td>
-                <td className="px-3 py-3 text-[var(--muted)]">
-                  {new Date(c.createdAt * 1000).toLocaleDateString()}
+        <Card title="Your contests">
+          <div className="mb-4 text-2xl font-semibold tracking-tight text-[var(--ink)] font-display">
+            Recent sessions
+          </div>
+          <Table headers={["Status", "Name", "Solved", "Created"]}>
+            {contests.map((c) => {
+              const solvedCount = Object.keys(c.progress.solved ?? {}).length;
+              const total = c.problems.length;
+              return (
+                <tr
+                  key={c.id}
+                  className="cursor-pointer transition hover:bg-[rgba(31,111,139,0.06)]"
+                  onClick={() => navigate(`/contests/${c.id}`)}
+                >
+                  <td className="px-3 py-3">{statusBadge(c.status)}</td>
+                  <td className="px-3 py-3 font-medium text-[var(--ink)]">{c.name}</td>
+                  <td className="px-3 py-3 text-[var(--muted)]">
+                    {solvedCount}/{total}
+                  </td>
+                  <td className="px-3 py-3 text-[var(--muted)]">
+                    {new Date(c.createdAt * 1000).toLocaleDateString()}
+                  </td>
+                </tr>
+              );
+            })}
+            {contests.length === 0 ? (
+              <tr>
+                <td className="px-3 py-6 text-center text-[var(--muted)]" colSpan={4}>
+                  No contests yet
                 </td>
               </tr>
-            );
-          })}
-          {contests.length === 0 ? (
-            <tr>
-              <td className="px-3 py-6 text-center text-[var(--muted)]" colSpan={4}>
-                No contests yet
-              </td>
-            </tr>
-          ) : null}
-        </Table>
-      </Card>
+            ) : null}
+          </Table>
+        </Card>
+      </div>
     </div>
   );
 }

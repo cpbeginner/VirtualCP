@@ -279,3 +279,14 @@ This file is an implementation log maintained by Codex per project requirements.
   - `npm -w frontend run build`
 - Result / issues:
   - Builds succeed with the refreshed UI and integration hardening.
+
+## Feature 22 - alternate UI redesign
+
+- Changes:
+  - Switched to a new layout with a left sidebar, updated color palette, and a geometric grid backdrop.
+  - Added page entrance and stagger animations for a more dynamic UX.
+  - Updated UI components to match the new visual language (rounded pill buttons, higher-contrast accents, softer cards).
+- Commands run:
+  - `npm -w frontend run build`
+- Result / issues:
+  - Frontend builds with the new layout and motion.

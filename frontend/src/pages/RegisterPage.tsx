@@ -30,33 +30,33 @@ export function RegisterPage() {
   });
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6">
+    <div className="flex min-h-screen items-center justify-center px-6 page-enter">
       <div className="w-full max-w-md">
         <Card title="Create account" className="relative overflow-hidden">
-          <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[rgba(10,107,90,0.12)] blur-2xl" />
-          <div className="absolute -bottom-20 -left-10 h-40 w-40 rounded-full bg-[rgba(191,122,0,0.16)] blur-2xl" />
+          <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[rgba(31,111,139,0.18)] blur-2xl" />
+          <div className="absolute -bottom-20 -left-10 h-40 w-40 rounded-full bg-[rgba(246,174,45,0.2)] blur-2xl" />
           <div className="relative">
             <div className="mb-3 text-2xl font-semibold tracking-tight text-[var(--ink)] font-display">
-              Create your arena
+              Build your playground
             </div>
             {error ? (
-            <Alert variant="error" className="mb-4">
-              {error}
-            </Alert>
-          ) : null}
-          <form
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setError(null);
-              register.mutate({
-                username,
-                password,
-                cfHandle: cfHandle.trim() ? cfHandle.trim() : undefined,
-                atcoderUser: atcoderUser.trim() ? atcoderUser.trim() : undefined,
-              });
-            }}
-          >
+              <Alert variant="error" className="mb-4">
+                {error}
+              </Alert>
+            ) : null}
+            <form
+              className="space-y-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setError(null);
+                register.mutate({
+                  username,
+                  password,
+                  cfHandle: cfHandle.trim() ? cfHandle.trim() : undefined,
+                  atcoderUser: atcoderUser.trim() ? atcoderUser.trim() : undefined,
+                });
+              }}
+            >
             <Input
               label="Username"
               autoComplete="username"
@@ -83,7 +83,7 @@ export function RegisterPage() {
             <Button type="submit" className="w-full" isLoading={register.isPending}>
               Create account
             </Button>
-          </form>
+            </form>
           <div className="mt-4 text-sm text-[var(--muted)]">
             Already have an account?{" "}
             <Link className="font-semibold text-[var(--primary)] hover:underline" to="/login">

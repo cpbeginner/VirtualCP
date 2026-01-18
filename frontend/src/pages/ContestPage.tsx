@@ -130,7 +130,7 @@ export function ContestPage() {
   const showPollError = !missingHandles && (cfStale || atStale);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 page-enter">
       {error ? <Alert variant="error">{error}</Alert> : null}
       {missingHandles ? (
         <Alert variant="warning">
@@ -141,10 +141,10 @@ export function ContestPage() {
         <Alert variant="error">Auto-tracking temporarily unavailable</Alert>
       ) : null}
 
-      <div className="rounded-2xl border border-[var(--stroke)] bg-[var(--card)]/85 p-5 shadow-[0_18px_45px_var(--shadow)] backdrop-blur">
+      <div className="rounded-3xl border border-[var(--stroke)] bg-[var(--card)]/85 p-5 shadow-[0_20px_50px_var(--shadow)] backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">
+            <div className="text-[11px] uppercase tracking-[0.35em] text-[var(--muted)]">
               <Link className="hover:underline" to="/dashboard">
                 VirtualCP / Dashboard
               </Link>{" "}
@@ -204,7 +204,7 @@ export function ContestPage() {
           const solved = contest.progress.solved?.[p.key];
           const letter = String.fromCharCode(65 + idx);
           return (
-            <tr key={p.key} className="transition hover:bg-[rgba(10,107,90,0.04)]">
+            <tr key={p.key} className="transition hover:bg-[rgba(31,111,139,0.06)]">
               <td className="px-3 py-3 font-medium text-[var(--ink)]">{letter}</td>
               <td className="px-3 py-3">
                 <Badge variant="neutral">{p.platform === "codeforces" ? "CF" : "AT"}</Badge>
