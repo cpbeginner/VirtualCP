@@ -10,25 +10,26 @@ export function Input(
   const { label, helperText, errorText, className, ...rest } = props;
   return (
     <label className="block">
-      <div className="mb-1 text-sm font-medium text-gray-900">{label}</div>
+      <div className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
+        {label}
+      </div>
       <input
         {...rest}
         className={[
-          "w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2",
+          "w-full rounded-lg border bg-[var(--card)] px-3 py-2 text-sm outline-none transition focus:ring-2",
           errorText
-            ? "border-red-300 focus:border-red-400 focus:ring-red-200"
-            : "border-gray-300 focus:border-blue-400 focus:ring-blue-200",
+            ? "border-[rgba(214,74,58,0.6)] focus:border-[var(--danger)] focus:ring-[rgba(214,74,58,0.2)]"
+            : "border-[var(--stroke)] focus:border-[var(--primary)] focus:ring-[rgba(10,107,90,0.18)]",
           className,
         ]
           .filter(Boolean)
           .join(" ")}
       />
       {errorText ? (
-        <div className="mt-1 text-sm text-red-600">{errorText}</div>
+        <div className="mt-1 text-xs text-[var(--danger)]">{errorText}</div>
       ) : helperText ? (
-        <div className="mt-1 text-sm text-gray-500">{helperText}</div>
+        <div className="mt-1 text-xs text-[var(--muted)]">{helperText}</div>
       ) : null}
     </label>
   );
 }
-

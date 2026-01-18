@@ -130,7 +130,7 @@ export function ContestPage() {
   const showPollError = !missingHandles && (cfStale || atStale);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {error ? <Alert variant="error">{error}</Alert> : null}
       {missingHandles ? (
         <Alert variant="warning">
@@ -141,21 +141,30 @@ export function ContestPage() {
         <Alert variant="error">Auto-tracking temporarily unavailable</Alert>
       ) : null}
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="text-sm text-gray-600">
-          <Link className="hover:underline" to="/dashboard">
-            VirtualCP / Dashboard
-          </Link>{" "}
-          / <span className="text-gray-900">{contest.name}</span>
-        </div>
+      <div className="rounded-2xl border border-[var(--stroke)] bg-[var(--card)]/85 p-5 shadow-[0_18px_45px_var(--shadow)] backdrop-blur">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">
+              <Link className="hover:underline" to="/dashboard">
+                VirtualCP / Dashboard
+              </Link>{" "}
+              / <span className="text-[var(--ink)]">{contest.name}</span>
+            </div>
+            <div className="mt-2 text-2xl font-semibold tracking-tight text-[var(--ink)] font-display">
+              {contest.name}
+            </div>
+          </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          {statusBadge(contest.status)}
-          {contest.status === "running" ? (
-            <div className="text-2xl font-semibold text-gray-900">{formatDurationHms(elapsedSeconds)}</div>
-          ) : null}
-          <div className="text-sm text-gray-700">
-            <span className="font-medium">Solved:</span> {solvedCount}/{total}
+          <div className="flex flex-wrap items-center gap-3">
+            {statusBadge(contest.status)}
+            {contest.status === "running" ? (
+              <div className="text-2xl font-semibold text-[var(--ink)]">
+                {formatDurationHms(elapsedSeconds)}
+              </div>
+            ) : null}
+            <div className="text-sm text-[var(--muted)]">
+              <span className="font-semibold text-[var(--ink)]">Solved:</span> {solvedCount}/{total}
+            </div>
           </div>
         </div>
       </div>
@@ -195,21 +204,26 @@ export function ContestPage() {
           const solved = contest.progress.solved?.[p.key];
           const letter = String.fromCharCode(65 + idx);
           return (
-            <tr key={p.key}>
-              <td className="px-3 py-2 font-medium text-gray-900">{letter}</td>
-              <td className="px-3 py-2">
+            <tr key={p.key} className="transition hover:bg-[rgba(10,107,90,0.04)]">
+              <td className="px-3 py-3 font-medium text-[var(--ink)]">{letter}</td>
+              <td className="px-3 py-3">
                 <Badge variant="neutral">{p.platform === "codeforces" ? "CF" : "AT"}</Badge>
               </td>
-              <td className="px-3 py-2 text-gray-700">{p.difficulty ?? "--"}</td>
-              <td className="px-3 py-2">
-                <a className="text-blue-600 hover:underline" href={p.url} target="_blank" rel="noreferrer">
+              <td className="px-3 py-3 text-[var(--muted)]">{p.difficulty ?? "--"}</td>
+              <td className="px-3 py-3">
+                <a
+                  className="font-semibold text-[var(--primary)] hover:underline"
+                  href={p.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {p.name}
                 </a>
               </td>
-              <td className="px-3 py-2">
+              <td className="px-3 py-3">
                 {solved ? <Badge variant="success">SOLVED</Badge> : <Badge variant="neutral">OPEN</Badge>}
               </td>
-              <td className="px-3 py-2 text-gray-700">
+              <td className="px-3 py-3 text-[var(--muted)]">
                 {solved ? formatDurationMmSs(solved.solveTimeSeconds) : "--"}
               </td>
             </tr>
@@ -217,7 +231,9 @@ export function ContestPage() {
         })}
       </Table>
 
-      <div className="text-sm text-gray-600">Last synced: {timeAgoFromUnixSeconds(lastSynced)}</div>
+      <div className="text-sm text-[var(--muted)]">
+        Last synced: {timeAgoFromUnixSeconds(lastSynced)}
+      </div>
     </div>
   );
 }

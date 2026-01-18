@@ -16,7 +16,7 @@ function formatTime(ts?: number) {
 function RatingGraph(props: { points: Array<{ t: number; rating: number }> }) {
   const { points } = props;
   if (points.length === 0) {
-    return <div className="text-sm text-gray-600">No rated contests</div>;
+    return <div className="text-sm text-[var(--muted)]">No rated contests</div>;
   }
 
   const w = 600;
@@ -39,11 +39,11 @@ function RatingGraph(props: { points: Array<{ t: number; rating: number }> }) {
     .join(" ");
 
   return (
-    <div className="rounded-md border border-gray-200 bg-white p-3">
+    <div className="rounded-xl border border-[var(--stroke)] bg-[var(--card)]/70 p-3">
       <svg viewBox={`0 0 ${w} ${h}`} className="h-44 w-full">
-        <polyline fill="none" stroke="#3b82f6" strokeWidth="2" points={pts} />
+        <polyline fill="none" stroke="var(--primary)" strokeWidth="2" points={pts} />
       </svg>
-      <div className="mt-2 flex justify-between text-xs text-gray-500">
+      <div className="mt-2 flex justify-between text-xs text-[var(--muted)]">
         <div>Min: {minY}</div>
         <div>Max: {maxY}</div>
       </div>
@@ -155,15 +155,18 @@ export function SettingsPage() {
             {atcoderWarning}
           </Alert>
         ) : null}
-        <div className="space-y-2 text-sm text-gray-700">
+        <div className="space-y-2 text-sm text-[var(--muted)]">
           <div>
-            <span className="font-medium">Updated:</span> {formatTime(cacheStatus.data?.updatedAt)}
+            <span className="font-semibold text-[var(--ink)]">Updated:</span>{" "}
+            {formatTime(cacheStatus.data?.updatedAt)}
           </div>
           <div>
-            <span className="font-medium">Codeforces:</span> {formatTime(cacheStatus.data?.codeforcesUpdatedAt)}
+            <span className="font-semibold text-[var(--ink)]">Codeforces:</span>{" "}
+            {formatTime(cacheStatus.data?.codeforcesUpdatedAt)}
           </div>
           <div>
-            <span className="font-medium">AtCoder Problems:</span> {formatTime(cacheStatus.data?.atcoderUpdatedAt)}
+            <span className="font-semibold text-[var(--ink)]">AtCoder Problems:</span>{" "}
+            {formatTime(cacheStatus.data?.atcoderUpdatedAt)}
           </div>
         </div>
         <div className="mt-4">
@@ -193,12 +196,14 @@ export function SettingsPage() {
         ) : null}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <div className="mb-2 text-sm font-medium text-gray-900">Codeforces</div>
+            <div className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
+              Codeforces
+            </div>
             {ratings.data?.codeforces ? (
               <div className="space-y-3">
-                <div className="text-sm text-gray-700">
+                <div className="text-sm text-[var(--muted)]">
                   <a
-                    className="text-blue-600 hover:underline"
+                    className="font-semibold text-[var(--primary)] hover:underline"
                     href={`https://codeforces.com/profile/${encodeURIComponent(
                       ratings.data.codeforces.handle,
                     )}`}
@@ -208,34 +213,42 @@ export function SettingsPage() {
                     {ratings.data.codeforces.handle}
                   </a>
                 </div>
-                <div className="grid grid-cols-3 gap-3 text-sm text-gray-700">
+                <div className="grid grid-cols-3 gap-3 text-sm text-[var(--muted)]">
                   <div>
-                    <div className="text-xs text-gray-500">Current</div>
-                    <div className="font-medium">{ratings.data.codeforces.current ?? "--"}</div>
+                    <div className="text-xs text-[var(--muted)]">Current</div>
+                    <div className="font-semibold text-[var(--ink)]">
+                      {ratings.data.codeforces.current ?? "--"}
+                    </div>
                   </div>
                   <div>
-                    <div className="text-xs text-gray-500">Max</div>
-                    <div className="font-medium">{ratings.data.codeforces.max ?? "--"}</div>
+                    <div className="text-xs text-[var(--muted)]">Max</div>
+                    <div className="font-semibold text-[var(--ink)]">
+                      {ratings.data.codeforces.max ?? "--"}
+                    </div>
                   </div>
                   <div>
-                    <div className="text-xs text-gray-500">Contests</div>
-                    <div className="font-medium">{ratings.data.codeforces.contests}</div>
+                    <div className="text-xs text-[var(--muted)]">Contests</div>
+                    <div className="font-semibold text-[var(--ink)]">
+                      {ratings.data.codeforces.contests}
+                    </div>
                   </div>
                 </div>
                 <RatingGraph points={ratings.data.codeforces.points} />
               </div>
             ) : (
-              <div className="text-sm text-gray-600">--</div>
+              <div className="text-sm text-[var(--muted)]">--</div>
             )}
           </div>
 
           <div>
-            <div className="mb-2 text-sm font-medium text-gray-900">AtCoder</div>
+            <div className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
+              AtCoder
+            </div>
             {ratings.data?.atcoder ? (
               <div className="space-y-3">
-                <div className="text-sm text-gray-700">
+                <div className="text-sm text-[var(--muted)]">
                   <a
-                    className="text-blue-600 hover:underline"
+                    className="font-semibold text-[var(--primary)] hover:underline"
                     href={`https://atcoder.jp/users/${encodeURIComponent(ratings.data.atcoder.user)}`}
                     target="_blank"
                     rel="noreferrer"
@@ -243,24 +256,30 @@ export function SettingsPage() {
                     {ratings.data.atcoder.user}
                   </a>
                 </div>
-                <div className="grid grid-cols-3 gap-3 text-sm text-gray-700">
+                <div className="grid grid-cols-3 gap-3 text-sm text-[var(--muted)]">
                   <div>
-                    <div className="text-xs text-gray-500">Current</div>
-                    <div className="font-medium">{ratings.data.atcoder.current ?? "--"}</div>
+                    <div className="text-xs text-[var(--muted)]">Current</div>
+                    <div className="font-semibold text-[var(--ink)]">
+                      {ratings.data.atcoder.current ?? "--"}
+                    </div>
                   </div>
                   <div>
-                    <div className="text-xs text-gray-500">Max</div>
-                    <div className="font-medium">{ratings.data.atcoder.max ?? "--"}</div>
+                    <div className="text-xs text-[var(--muted)]">Max</div>
+                    <div className="font-semibold text-[var(--ink)]">
+                      {ratings.data.atcoder.max ?? "--"}
+                    </div>
                   </div>
                   <div>
-                    <div className="text-xs text-gray-500">Contests</div>
-                    <div className="font-medium">{ratings.data.atcoder.contests}</div>
+                    <div className="text-xs text-[var(--muted)]">Contests</div>
+                    <div className="font-semibold text-[var(--ink)]">
+                      {ratings.data.atcoder.contests}
+                    </div>
                   </div>
                 </div>
                 <RatingGraph points={ratings.data.atcoder.points} />
               </div>
             ) : (
-              <div className="text-sm text-gray-600">--</div>
+              <div className="text-sm text-[var(--muted)]">--</div>
             )}
           </div>
         </div>

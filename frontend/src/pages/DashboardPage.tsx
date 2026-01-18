@@ -76,6 +76,9 @@ export function DashboardPage() {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       <Card title="Create virtual contest">
+        <div className="mb-4 text-2xl font-semibold tracking-tight text-[var(--ink)] font-display">
+          Design a custom set
+        </div>
         {error ? (
           <Alert variant="error" className="mb-4">
             {error}
@@ -162,7 +165,10 @@ export function DashboardPage() {
                 const minLabel = p.platform === "codeforces" ? "CF rating min" : "AT difficulty min";
                 const maxLabel = p.platform === "codeforces" ? "CF rating max" : "AT difficulty max";
                 return (
-                  <div key={p.id} className="rounded-md border border-gray-200 bg-white p-3">
+                  <div
+                    key={p.id}
+                    className="rounded-xl border border-[var(--stroke)] bg-[rgba(255,255,255,0.7)] p-3"
+                  >
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
                       <Select
                         label={`Problem ${idx + 1} platform`}
@@ -212,7 +218,7 @@ export function DashboardPage() {
                 );
               })}
               {problemSpecs.length === 0 ? (
-                <div className="text-sm text-gray-600">No problems yet</div>
+                <div className="text-sm text-[var(--muted)]">No problems yet</div>
               ) : null}
             </div>
           </div>
@@ -224,7 +230,7 @@ export function DashboardPage() {
             helperText="OR filter (any matching tag)"
           />
 
-          <label className="flex items-center gap-2 text-sm text-gray-700">
+          <label className="flex items-center gap-2 text-sm text-[var(--muted)]">
             <input
               type="checkbox"
               checked={excludeSolved}
@@ -233,7 +239,7 @@ export function DashboardPage() {
             Exclude already solved
           </label>
 
-          <label className="flex items-center gap-2 text-sm text-gray-700">
+          <label className="flex items-center gap-2 text-sm text-[var(--muted)]">
             <input
               type="checkbox"
               checked={startImmediately}
@@ -249,6 +255,9 @@ export function DashboardPage() {
       </Card>
 
       <Card title="Your contests">
+        <div className="mb-4 text-2xl font-semibold tracking-tight text-[var(--ink)] font-display">
+          Recent sessions
+        </div>
         <Table headers={["Status", "Name", "Solved", "Created"]}>
           {contests.map((c) => {
             const solvedCount = Object.keys(c.progress.solved ?? {}).length;
@@ -256,15 +265,15 @@ export function DashboardPage() {
             return (
               <tr
                 key={c.id}
-                className="cursor-pointer hover:bg-gray-50"
+                className="cursor-pointer transition hover:bg-[rgba(10,107,90,0.06)]"
                 onClick={() => navigate(`/contests/${c.id}`)}
               >
-                <td className="px-3 py-2">{statusBadge(c.status)}</td>
-                <td className="px-3 py-2 font-medium text-gray-900">{c.name}</td>
-                <td className="px-3 py-2 text-gray-700">
+                <td className="px-3 py-3">{statusBadge(c.status)}</td>
+                <td className="px-3 py-3 font-medium text-[var(--ink)]">{c.name}</td>
+                <td className="px-3 py-3 text-[var(--muted)]">
                   {solvedCount}/{total}
                 </td>
-                <td className="px-3 py-2 text-gray-700">
+                <td className="px-3 py-3 text-[var(--muted)]">
                   {new Date(c.createdAt * 1000).toLocaleDateString()}
                 </td>
               </tr>
@@ -272,7 +281,7 @@ export function DashboardPage() {
           })}
           {contests.length === 0 ? (
             <tr>
-              <td className="px-3 py-6 text-center text-gray-500" colSpan={4}>
+              <td className="px-3 py-6 text-center text-[var(--muted)]" colSpan={4}>
                 No contests yet
               </td>
             </tr>

@@ -30,10 +30,16 @@ export function RegisterPage() {
   });
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-6">
+    <div className="flex min-h-screen items-center justify-center px-6">
       <div className="w-full max-w-md">
-        <Card title="Create account">
-          {error ? (
+        <Card title="Create account" className="relative overflow-hidden">
+          <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[rgba(10,107,90,0.12)] blur-2xl" />
+          <div className="absolute -bottom-20 -left-10 h-40 w-40 rounded-full bg-[rgba(191,122,0,0.16)] blur-2xl" />
+          <div className="relative">
+            <div className="mb-3 text-2xl font-semibold tracking-tight text-[var(--ink)] font-display">
+              Create your arena
+            </div>
+            {error ? (
             <Alert variant="error" className="mb-4">
               {error}
             </Alert>
@@ -78,15 +84,15 @@ export function RegisterPage() {
               Create account
             </Button>
           </form>
-          <div className="mt-4 text-sm text-gray-600">
+          <div className="mt-4 text-sm text-[var(--muted)]">
             Already have an account?{" "}
-            <Link className="text-blue-600 hover:underline" to="/login">
+            <Link className="font-semibold text-[var(--primary)] hover:underline" to="/login">
               Sign in
             </Link>
+          </div>
           </div>
         </Card>
       </div>
     </div>
   );
 }
-

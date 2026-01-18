@@ -24,6 +24,7 @@ import fs from "fs/promises";
 import path from "path";
 import { env } from "../env";
 import { Throttler } from "../utils/throttle";
+import { fetchJson } from "../utils/http";
 
 const atThrottle = new Throttler(env.MOCK_OJ ? 0 : 1100);
 
@@ -35,9 +36,10 @@ async function readFixtureJson<T>(fileName: string): Promise<T> {
 
 async function atGetJson<T>(url: string): Promise<T> {
   return await atThrottle.schedule(async () => {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`AtCoder Problems HTTP ${res.status}`);
-    return (await res.json()) as T;
+    return await fetchJson<T>(url, {
+      timeoutMs: 15000,
+      headers: { "User-Agent": "VirtualCP/1.0" },
+    });
   });
 }
 

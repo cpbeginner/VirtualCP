@@ -267,3 +267,15 @@ This file is an implementation log maintained by Codex per project requirements.
   - `git -c http.extraheader="AUTHORIZATION: basic <redacted>" push -u origin main`
 - Result / issues:
   - Repo is live at https://github.com/cpbeginner/VirtualCP
+
+## Feature 21 - UI redesign + robustness tweaks
+
+- Changes:
+  - Introduced a modern, warm-toned visual system (new fonts, gradient background, updated cards/buttons/inputs/badges/tables).
+  - Refined page layouts for dashboard, contest, login/register, and settings to match the new theme.
+  - Added shared HTTP JSON fetch with timeouts + user-agent headers for external integrations.
+- Commands run:
+  - `npm -w backend run build`
+  - `npm -w frontend run build`
+- Result / issues:
+  - Builds succeed with the refreshed UI and integration hardening.

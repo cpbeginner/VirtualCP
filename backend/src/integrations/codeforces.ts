@@ -36,6 +36,7 @@ import fs from "fs/promises";
 import path from "path";
 import { env } from "../env";
 import { Throttler } from "../utils/throttle";
+import { fetchJson } from "../utils/http";
 
 const CF_BASE = "https://codeforces.com/api";
 const cfThrottle = new Throttler(env.MOCK_OJ ? 0 : 2100);
@@ -48,11 +49,10 @@ async function readFixtureJson<T>(fileName: string): Promise<T> {
 
 async function cfGetJson<T>(url: string): Promise<T> {
   return await cfThrottle.schedule(async () => {
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error(`Codeforces HTTP ${res.status}`);
-    }
-    return (await res.json()) as T;
+    return await fetchJson<T>(url, {
+      timeoutMs: 15000,
+      headers: { "User-Agent": "VirtualCP/1.0" },
+    });
   });
 }
 
