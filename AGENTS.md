@@ -257,3 +257,13 @@ This file is an implementation log maintained by Codex per project requirements.
   - `git branch -M main`
 - Result / issues:
   - Local branch is now `main`.
+
+## Feature 20 - GitHub publish
+
+- Changes:
+  - Created the public GitHub repo `cpbeginner/VirtualCP` and pushed `main`.
+- Commands run:
+  - `Invoke-RestMethod -Method Post https://api.github.com/user/repos ...`
+  - `git -c http.extraheader="AUTHORIZATION: basic <redacted>" push -u origin main`
+- Result / issues:
+  - Repo is live at https://github.com/cpbeginner/VirtualCP
