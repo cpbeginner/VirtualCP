@@ -50,6 +50,15 @@ async function main() {
   if (!regRes.ok || !regBody.ok) throw new Error(`Register failed: ${regBody?.error ?? regRes.status}`);
   const cookie = getCookieFromSetCookie(regRes.headers.get("set-cookie"));
 
+  const wrappedWarmRes = await fetch(`${baseUrl}/api/wrapped/codeforces?year=2023`, {
+    method: "GET",
+    headers: { Cookie: cookie },
+  });
+  const wrappedWarmBody = await wrappedWarmRes.json();
+  if (!wrappedWarmRes.ok || !wrappedWarmBody.ok) {
+    throw new Error(`Wrapped warm failed: ${wrappedWarmBody?.error ?? wrappedWarmRes.status}`);
+  }
+
   const authHeaders = {
     Cookie: cookie,
     "Content-Type": "application/json",
@@ -115,6 +124,16 @@ async function main() {
       method: "POST",
       headers: authHeaders,
       body: "{}",
+      connections,
+      duration: durationSeconds,
+    }),
+  );
+
+  results.push(
+    await runAutocannon({
+      url: `${baseUrl}/api/wrapped/codeforces?year=2023`,
+      method: "GET",
+      headers: { Cookie: cookie },
       connections,
       duration: durationSeconds,
     }),

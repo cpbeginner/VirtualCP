@@ -28,6 +28,9 @@ export type CfUserStatusResponse = {
     problem: {
       contestId?: number;
       index: string;
+      name?: string;
+      rating?: number;
+      tags?: string[];
     };
   }>;
 };
@@ -74,14 +77,29 @@ export async function fetchCodeforcesProblemset(): Promise<CfProblem[]> {
     }));
 }
 
-export async function fetchCodeforcesUserStatus(handle: string): Promise<CfUserStatusResponse["result"]> {
+export async function fetchCodeforcesUserStatus(
+  handle: string,
+  opts?: { from?: number; count?: number },
+): Promise<CfUserStatusResponse["result"]> {
+  let url = `${CF_BASE}/user.status?handle=${encodeURIComponent(handle)}`;
+  if (!env.MOCK_OJ) {
+    if (opts?.from !== undefined) url += `&from=${encodeURIComponent(String(opts.from))}`;
+    if (opts?.count !== undefined) url += `&count=${encodeURIComponent(String(opts.count))}`;
+  }
+
   const data = env.MOCK_OJ
     ? await readFixtureJson<CfUserStatusResponse>("codeforces_user.status.json")
-    : await cfGetJson<CfUserStatusResponse>(
-        `${CF_BASE}/user.status?handle=${encodeURIComponent(handle)}`,
-      );
+    : await cfGetJson<CfUserStatusResponse>(url);
 
   if (data.status !== "OK") throw new Error("Codeforces user.status failed");
+
+  if (env.MOCK_OJ && (opts?.from !== undefined || opts?.count !== undefined)) {
+    const from = opts?.from ?? 1;
+    const count = opts?.count ?? data.result.length;
+    const start = Math.max(0, from - 1);
+    return data.result.slice(start, start + count);
+  }
+
   return data.result;
 }
 

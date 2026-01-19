@@ -7,17 +7,20 @@ import { env } from "./env";
 import { createFileDb } from "./store/fileDb";
 import { createCacheService } from "./services/cacheService";
 import { createContestService } from "./services/contestService";
+import { createWrappedService } from "./services/wrappedService";
 import { errorHandler } from "./middleware/errorHandler";
 import { authRouter } from "./routes/auth";
 import { meRouter } from "./routes/me";
 import { cacheRouter } from "./routes/cache";
 import { contestsRouter } from "./routes/contests";
+import { wrappedRouter } from "./routes/wrapped";
 
 export function createApp(overrides?: {
   logger?: pino.Logger;
   fileDb?: ReturnType<typeof createFileDb>;
   cacheService?: ReturnType<typeof createCacheService>;
   contestService?: ReturnType<typeof createContestService>;
+  wrappedService?: ReturnType<typeof createWrappedService>;
 }) {
   const app = express();
 
@@ -39,6 +42,8 @@ export function createApp(overrides?: {
   app.locals.contestService =
     overrides?.contestService ??
     createContestService({ fileDb: app.locals.fileDb, cacheService: app.locals.cacheService, logger });
+  app.locals.wrappedService =
+    overrides?.wrappedService ?? createWrappedService({ logger });
 
   app.use(
     pinoHttp({
@@ -60,6 +65,7 @@ export function createApp(overrides?: {
   app.use("/api/me", meRouter);
   app.use("/api/cache", cacheRouter);
   app.use("/api/contests", contestsRouter);
+  app.use("/api/wrapped", wrappedRouter);
 
   app.use(errorHandler);
 

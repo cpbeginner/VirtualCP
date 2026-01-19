@@ -290,3 +290,49 @@ This file is an implementation log maintained by Codex per project requirements.
   - `npm -w frontend run build`
 - Result / issues:
   - Frontend builds with the new layout and motion.
+
+## Feature 22 - Codeforces Wrapped (backend)
+
+- Changes:
+  - Added `yearRangeUtcSeconds(year)` UTC helper in `backend/src/utils/time.ts`.
+  - Extended Codeforces `user.status` integration with paging params + MOCK slicing and richer problem fields.
+  - Implemented `backend/src/services/wrappedService.ts` with 12h in-memory cache and required stats computations.
+  - Added `GET /api/wrapped/codeforces?year=2023|2024|2025[&refresh=1]` via `backend/src/routes/wrapped.ts` and mounted it in `backend/src/app.ts`.
+  - Updated `backend/test/fixtures/codeforces_user.status.json` and added `backend/test/wrappedCodeforces.test.ts`.
+- Decisions:
+  - Keep cache in-memory only (TTL 12h) and return warnings on partial/unavailable data instead of failing the endpoint.
+- Commands run:
+  - `npm -w backend test`
+  - `npm -w backend run build`
+- Result / issues:
+  - Backend tests pass and TypeScript build succeeds.
+
+## Feature 23 - Codeforces Wrapped (frontend story UI)
+
+- Changes:
+  - Added `/wrapped` protected route and nav link.
+  - Implemented Wrapped page (`frontend/src/pages/WrappedPage.tsx`) with year chips, warnings, and “Play story”.
+  - Added StoryPlayer overlay + slides (intro/solved/tags/difficulty/rating/outro) under `frontend/src/components/wrapped/*`.
+  - Added story-specific CSS animations and reduced-motion handling in `frontend/src/index.css`.
+- Decisions:
+  - Keep story UI dependency-free (no charting/animation libraries) and respect `prefers-reduced-motion`.
+- Commands run:
+  - `npm -w frontend run build`
+- Result / issues:
+  - Frontend build succeeds; story overlay works with keyboard + tap navigation.
+
+## Feature 24 - Wrapped stress + docs
+
+- Changes:
+  - Extended stress test to warm and load-test `GET /api/wrapped/codeforces?year=2023` in `MOCK_OJ=1`.
+  - Updated `DOCUMENTATION.md` with the wrapped endpoint, UI usage notes, and stress coverage.
+  - Reset `backend/data/db.json` back to an empty baseline after running stress.
+- Decisions:
+  - Keep stress safe by staying in `MOCK_OJ=1` and using fixtures only (no external traffic).
+- Commands run:
+  - `npm run test`
+  - `npm run build`
+  - `npm run stress`
+  - `npm -w backend test`
+- Result / issues:
+  - Tests pass; builds succeed; stress completes and db.json remains valid.

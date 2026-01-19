@@ -64,6 +64,9 @@ Contests:
 - `POST /api/contests/:id/finish`
 - `POST /api/contests/:id/refresh`
 
+Wrapped:
+- `GET /api/wrapped/codeforces?year=2023|2024|2025[&refresh=1]`
+
 ## Data storage (no DB)
 
 - Persistent state: `backend/data/db.json`
@@ -100,6 +103,13 @@ This mode is used by automated tests and by `npm run stress` to avoid hammering 
 - AtCoder ratings use the public user history JSON (`/users/{user}/history/json`).
 - The Settings page renders a simple rating graph and basic stats (current, max, contests). Failures are shown as warnings.
 
+## Wrapped (Codeforces)
+
+- Endpoint: `GET /api/wrapped/codeforces?year=2023|2024|2025` (auth required).
+- If you add `&refresh=1`, the backend bypasses its in-memory cache and recomputes.
+- Responses include `warnings` (e.g., if Codeforces history is unavailable or truncated).
+- UI: open `/wrapped`, pick a year chip, then click "Play story".
+
 ## Poller behavior and rate limits
 
 - Backend periodically checks real submissions and updates contest progress.
@@ -117,7 +127,8 @@ npm run stress
 Runs a safe stress test that does not call real Codeforces/AtCoder by enabling `MOCK_OJ=1`. It:
 
 - Creates a test user + contest
-- Runs `autocannon` against key endpoints (list, detail, refresh)
+- Warms the wrapped endpoint once (`GET /api/wrapped/codeforces?year=2023`)
+- Runs `autocannon` against key endpoints (list, detail, refresh, wrapped)
 - Verifies `backend/data/db.json` remains valid JSON afterward
 
 ## Limitations

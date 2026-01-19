@@ -46,6 +46,9 @@ export function AppShell() {
             <NavLink to="/dashboard" className={({ isActive }) => linkClassName(isActive)}>
               Dashboard
             </NavLink>
+            <NavLink to="/wrapped" className={({ isActive }) => linkClassName(isActive)}>
+              Wrapped
+            </NavLink>
             <NavLink to="/settings" className={({ isActive }) => linkClassName(isActive)}>
               Settings
             </NavLink>

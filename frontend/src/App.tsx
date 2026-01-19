@@ -8,6 +8,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { WrappedPage } from "./pages/WrappedPage";
 
 export function App() {
   useQuery({
@@ -31,6 +32,7 @@ export function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/contests/:id" element={<ContestPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/wrapped" element={<WrappedPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
