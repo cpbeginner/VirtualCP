@@ -79,3 +79,32 @@ export const CreateContestSchema = z.object({
     });
   }
 });
+
+export const CreateRoomSchema = CreateContestSchema;
+
+export const JoinRoomSchema = z.object({
+  inviteCode: z.string().min(4).max(32),
+});
+
+export const RoomMessageSchema = z.object({
+  text: z.string().min(1).max(500),
+});
+
+export const PatchPreferencesSchema = z.object({
+  theme: z.enum(["aurora", "sunset", "midnight"]).optional(),
+  motion: z.enum(["system", "on", "off"]).optional(),
+  effects: z
+    .object({
+      particles: z.boolean().optional(),
+      confetti: z.boolean().optional(),
+      glowCursor: z.boolean().optional(),
+      ambientGradient: z.boolean().optional(),
+      sounds: z.boolean().optional(),
+    })
+    .optional(),
+});
+
+export const FavoriteKeySchema = z.object({
+  platform: z.enum(["codeforces", "atcoder"]),
+  key: z.string().min(1).max(128),
+});

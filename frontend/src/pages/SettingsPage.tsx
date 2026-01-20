@@ -2,11 +2,28 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { apiMe, apiPatchHandles, apiRatings } from "../api/auth";
 import { apiCacheRefresh, apiCacheStatus } from "../api/cache";
+import { apiPatchPreferences, apiProfile } from "../api/profile";
 import { ApiError } from "../api/client";
 import { Alert } from "../components/ui/Alert";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
+import { Select } from "../components/ui/Select";
+
+function resolveMotion(motion: "system" | "on" | "off"): "on" | "off" {
+  if (motion === "on") return "on";
+  if (motion === "off") return "off";
+  const system =
+    typeof window !== "undefined" &&
+    (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false);
+  return system ? "off" : "on";
+}
+
+function applyPreferencesToDom(prefs: { theme: string; motion: "system" | "on" | "off" }) {
+  if (typeof document === "undefined") return;
+  document.documentElement.dataset.theme = prefs.theme;
+  document.documentElement.dataset.motion = resolveMotion(prefs.motion);
+}
 
 function formatTime(ts?: number) {
   if (!ts) return "--";
@@ -55,6 +72,12 @@ export function SettingsPage() {
   const qc = useQueryClient();
   const me = useQuery({ queryKey: ["me"], queryFn: apiMe, retry: false });
   const cacheStatus = useQuery({ queryKey: ["cacheStatus"], queryFn: apiCacheStatus, retry: false });
+  const profile = useQuery({
+    queryKey: ["profile"],
+    queryFn: apiProfile,
+    enabled: me.isSuccess,
+    retry: false,
+  });
   const ratings = useQuery({
     queryKey: ["ratings", me.data?.cfHandle, me.data?.atcoderUser],
     queryFn: apiRatings,
@@ -70,6 +93,19 @@ export function SettingsPage() {
   const [cacheMessage, setCacheMessage] = useState<{ kind: "success" | "error"; text: string } | null>(
     null,
   );
+  const [prefsMessage, setPrefsMessage] = useState<{ kind: "success" | "error"; text: string } | null>(
+    null,
+  );
+
+  const [theme, setTheme] = useState<"aurora" | "sunset" | "midnight">("aurora");
+  const [motion, setMotion] = useState<"system" | "on" | "off">("system");
+  const [effects, setEffects] = useState({
+    particles: true,
+    confetti: true,
+    glowCursor: true,
+    ambientGradient: true,
+    sounds: false,
+  });
 
   useEffect(() => {
     if (me.data) {
@@ -77,6 +113,13 @@ export function SettingsPage() {
       setAtcoderUser(me.data.atcoderUser ?? "");
     }
   }, [me.data]);
+
+  useEffect(() => {
+    if (!profile.data) return;
+    setTheme(profile.data.preferences.theme);
+    setMotion(profile.data.preferences.motion);
+    setEffects(profile.data.preferences.effects);
+  }, [profile.data]);
 
   const saveHandles = useMutation({
     mutationFn: apiPatchHandles,
@@ -97,11 +140,27 @@ export function SettingsPage() {
     onSuccess: (meta) => {
       qc.setQueryData(["cacheStatus"], meta);
       setCacheMessage({ kind: "success", text: "Cache refreshed" });
+      qc.invalidateQueries({ queryKey: ["profile"] });
     },
     onError: (err) => {
       setCacheMessage({
         kind: "error",
         text: err instanceof ApiError ? err.message : "Refresh failed",
+      });
+    },
+  });
+
+  const savePreferences = useMutation({
+    mutationFn: apiPatchPreferences,
+    onSuccess: (prefs) => {
+      qc.setQueryData(["profile"], (prev: any) => (prev ? { ...prev, preferences: prefs } : prev));
+      applyPreferencesToDom({ theme: prefs.theme, motion: prefs.motion });
+      setPrefsMessage({ kind: "success", text: "Saved" });
+    },
+    onError: (err) => {
+      setPrefsMessage({
+        kind: "error",
+        text: err instanceof ApiError ? err.message : "Save failed",
       });
     },
   });
@@ -180,6 +239,70 @@ export function SettingsPage() {
           >
             Refresh cache
           </Button>
+        </div>
+      </Card>
+
+      <Card title="Experience" className="md:col-span-2">
+        {prefsMessage ? (
+          <Alert variant={prefsMessage.kind === "success" ? "info" : "error"} className="mb-4">
+            {prefsMessage.text}
+          </Alert>
+        ) : null}
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="space-y-4">
+            <Select
+              label="Theme"
+              value={theme}
+              onChange={(e) => setTheme(e.target.value as any)}
+              options={[
+                { value: "aurora", label: "Aurora" },
+                { value: "sunset", label: "Sunset" },
+                { value: "midnight", label: "Midnight" },
+              ]}
+            />
+            <Select
+              label="Motion"
+              value={motion}
+              onChange={(e) => setMotion(e.target.value as any)}
+              options={[
+                { value: "system", label: "System" },
+                { value: "on", label: "On" },
+                { value: "off", label: "Off" },
+              ]}
+            />
+            <Button
+              onClick={() => {
+                setPrefsMessage(null);
+                savePreferences.mutate({ theme, motion, effects });
+              }}
+              isLoading={savePreferences.isPending}
+            >
+              Save preferences
+            </Button>
+          </div>
+
+          <div className="space-y-3">
+            <div className="text-sm font-semibold text-[var(--ink)]">Effects</div>
+            {(
+              [
+                ["particles", "Particles backdrop"],
+                ["confetti", "Confetti"],
+                ["glowCursor", "Glow cursor"],
+                ["ambientGradient", "Ambient gradient"],
+                ["sounds", "Sounds"],
+              ] as const
+            ).map(([key, label]) => (
+              <label key={key} className="flex items-center gap-2 text-sm text-[var(--muted)]">
+                <input
+                  type="checkbox"
+                  checked={(effects as any)[key]}
+                  onChange={(e) => setEffects((prev) => ({ ...prev, [key]: e.target.checked }))}
+                />
+                {label}
+              </label>
+            ))}
+          </div>
         </div>
       </Card>
 

@@ -50,6 +50,12 @@ User:
 - `GET /api/me`
 - `PATCH /api/me/handles`
 - `GET /api/me/ratings`
+- `GET /api/me/profile`
+- `PATCH /api/me/preferences`
+
+Stats:
+- `GET /api/leaderboard?limit=20`
+- `GET /api/achievements`
 
 Cache:
 - `GET /api/cache/status`
@@ -64,12 +70,36 @@ Contests:
 - `POST /api/contests/:id/finish`
 - `POST /api/contests/:id/refresh`
 
+Rooms:
+- `POST /api/rooms`
+- `GET /api/rooms`
+- `GET /api/rooms/:id`
+- `POST /api/rooms/:id/join`
+- `POST /api/rooms/:id/leave`
+- `POST /api/rooms/:id/start`
+- `POST /api/rooms/:id/finish`
+- `POST /api/rooms/:id/refresh`
+- `GET /api/rooms/:id/messages?limit=50`
+- `POST /api/rooms/:id/messages`
+
+Stream (SSE):
+- `GET /api/stream`
+
+Problems:
+- `GET /api/problems/search`
+
+Favorites:
+- `GET /api/me/favorites`
+- `POST /api/me/favorites`
+- `DELETE /api/me/favorites/:platform/:key`
+
 Wrapped:
 - `GET /api/wrapped/codeforces?year=2023|2024|2025[&refresh=1]`
 
 ## Data storage (no DB)
 
 - Persistent state: `backend/data/db.json`
+- `db.json` top-level keys: `users`, `contests`, `rooms`, `roomMessages`, `activities`
 - Writes are protected with `proper-lockfile` and atomic temp-file writes to stay safe under concurrent HTTP + poller writes.
 - Cache files:
   - `backend/data/cache/codeforces_problemset.json`
@@ -82,6 +112,7 @@ Wrapped:
 - Codeforces uses `problemset.problems` with strict throttling (<= 1 request / 2s).
 - AtCoder Problems datasets are fetched from `kenkoooo.com` with strict throttling (sleep > 1s).
 - If caches are missing, contest generation returns a clear error prompting you to refresh.
+- `/api/problems/search` also depends on caches (refresh in Settings first).
 
 ## MOCK_OJ mode
 
@@ -110,6 +141,15 @@ This mode is used by automated tests and by `npm run stress` to avoid hammering 
 - Responses include `warnings` (e.g., if Codeforces history is unavailable or truncated).
 - UI: open `/wrapped`, pick a year chip, then click "Play story".
 
+## Preferences / Motion
+
+- Preferences are stored per-user in `db.json` under `user.preferences`.
+- Motion has three modes:
+  - `system`: respects `prefers-reduced-motion`
+  - `on`: enable motion
+  - `off`: disable motion (animations/effects)
+- UI: open `/effects` to preview effects and quickly toggle preferences.
+
 ## Poller behavior and rate limits
 
 - Backend periodically checks real submissions and updates contest progress.
@@ -126,10 +166,13 @@ npm run stress
 
 Runs a safe stress test that does not call real Codeforces/AtCoder by enabling `MOCK_OJ=1`. It:
 
-- Creates a test user + contest
+- Creates two test users
+- Refreshes caches once and validates `GET /api/me/profile` (includes `cache_refresher` achievement)
+- Creates a contest and a room (join/start/refresh) and posts room chat messages
+- Exercises problem search + favorite/unfavorite flow
 - Warms the wrapped endpoint once (`GET /api/wrapped/codeforces?year=2023`)
-- Runs `autocannon` against key endpoints (list, detail, refresh, wrapped)
-- Verifies `backend/data/db.json` remains valid JSON afterward
+- Runs `autocannon` against key endpoints (contests, rooms, refresh, wrapped, leaderboard, problems search)
+- Verifies `backend/data/db.json` remains valid JSON and contains the expected top-level keys afterward
 
 ## Limitations
 

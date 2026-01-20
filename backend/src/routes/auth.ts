@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { env } from "../env";
 import { LoginSchema, RegisterSchema } from "../domain/schemas";
+import type { User } from "../domain/dbTypes";
 import { newId } from "../utils/ids";
 import { locals } from "../utils/locals";
 import { nowUnixSeconds } from "../utils/time";
@@ -49,13 +50,32 @@ authRouter.post("/register", async (req, res, next) => {
     const exists = db.users.some((u) => u.username === username);
     if (exists) throw badRequest("Username already exists");
 
-    const newUser = {
+    const newUser: User = {
       id: newId(),
       username,
       passwordHash,
       cfHandle,
       atcoderUser,
       createdAt: nowUnixSeconds(),
+      stats: {
+        xp: 0,
+        totalSolved: 0,
+        solvedByPlatform: { codeforces: 0, atcoder: 0 },
+        streakDays: 0,
+        achievements: {},
+      },
+      preferences: {
+        theme: "aurora",
+        motion: "system",
+        effects: {
+          particles: true,
+          confetti: true,
+          glowCursor: true,
+          ambientGradient: true,
+          sounds: false,
+        },
+      },
+      favorites: [],
     };
     db.users.push(newUser);
     return newUser;

@@ -3,7 +3,7 @@ import fsp from "fs/promises";
 import path from "path";
 import lockfile from "proper-lockfile";
 import type { Logger } from "pino";
-import type { Db } from "../domain/dbTypes";
+import type { Db, UserPreferences, UserStats } from "../domain/dbTypes";
 
 type FileDbOptions = {
   filePath: string;
@@ -12,7 +12,89 @@ type FileDbOptions = {
 
 type UpdateFn<T> = (db: Db) => Promise<T> | T;
 
-const DefaultDb: Db = { users: [], contests: [] };
+const DefaultDb: Db = { users: [], contests: [], rooms: [], roomMessages: [], activities: [] };
+
+function defaultUserStats(): UserStats {
+  return {
+    xp: 0,
+    totalSolved: 0,
+    solvedByPlatform: { codeforces: 0, atcoder: 0 },
+    streakDays: 0,
+    achievements: {},
+  };
+}
+
+function defaultUserPreferences(): UserPreferences {
+  return {
+    theme: "aurora",
+    motion: "system",
+    effects: {
+      particles: true,
+      confetti: true,
+      glowCursor: true,
+      ambientGradient: true,
+      sounds: false,
+    },
+  };
+}
+
+function normalizeDb(raw: any): Db {
+  const db: any = raw && typeof raw === "object" ? raw : {};
+
+  if (!Array.isArray(db.users)) db.users = [];
+  if (!Array.isArray(db.contests)) db.contests = [];
+  if (!Array.isArray(db.rooms)) db.rooms = [];
+  if (!Array.isArray(db.roomMessages)) db.roomMessages = [];
+  if (!Array.isArray(db.activities)) db.activities = [];
+
+  for (const user of db.users) {
+    if (!user || typeof user !== "object") continue;
+
+    if (!user.stats || typeof user.stats !== "object") user.stats = defaultUserStats();
+    if (!user.stats.solvedByPlatform || typeof user.stats.solvedByPlatform !== "object") {
+      user.stats.solvedByPlatform = { codeforces: 0, atcoder: 0 };
+    } else {
+      if (typeof user.stats.solvedByPlatform.codeforces !== "number") {
+        user.stats.solvedByPlatform.codeforces = 0;
+      }
+      if (typeof user.stats.solvedByPlatform.atcoder !== "number") {
+        user.stats.solvedByPlatform.atcoder = 0;
+      }
+    }
+
+    if (typeof user.stats.xp !== "number") user.stats.xp = 0;
+    if (typeof user.stats.totalSolved !== "number") user.stats.totalSolved = 0;
+    if (typeof user.stats.streakDays !== "number") user.stats.streakDays = 0;
+    if (!user.stats.achievements || typeof user.stats.achievements !== "object") {
+      user.stats.achievements = {};
+    }
+
+    if (!user.preferences || typeof user.preferences !== "object") {
+      user.preferences = defaultUserPreferences();
+    }
+    if (!user.preferences.effects || typeof user.preferences.effects !== "object") {
+      user.preferences.effects = defaultUserPreferences().effects;
+    } else {
+      const defaults = defaultUserPreferences().effects;
+      for (const key of Object.keys(defaults) as Array<keyof typeof defaults>) {
+        if (typeof user.preferences.effects[key] !== "boolean") {
+          user.preferences.effects[key] = defaults[key];
+        }
+      }
+    }
+
+    if (user.preferences.theme !== "aurora" && user.preferences.theme !== "sunset" && user.preferences.theme !== "midnight") {
+      user.preferences.theme = "aurora";
+    }
+    if (user.preferences.motion !== "system" && user.preferences.motion !== "on" && user.preferences.motion !== "off") {
+      user.preferences.motion = "system";
+    }
+
+    if (!Array.isArray(user.favorites)) user.favorites = [];
+  }
+
+  return db as Db;
+}
 
 async function ensureParentDir(filePath: string): Promise<void> {
   await fsp.mkdir(path.dirname(filePath), { recursive: true });
@@ -91,8 +173,8 @@ export function createFileDb({ filePath, logger }: FileDbOptions) {
     await init();
     const release = await lockfile.lock(filePath, lockOptions);
     try {
-      const db = await readJsonFile<Db>(filePath);
-      return db;
+      const raw = await readJsonFile<any>(filePath);
+      return normalizeDb(raw);
     } finally {
       await release();
     }
@@ -102,9 +184,10 @@ export function createFileDb({ filePath, logger }: FileDbOptions) {
     await init();
     const release = await lockfile.lock(filePath, lockOptions);
     try {
-      const db = await readJsonFile<Db>(filePath);
+      const raw = await readJsonFile<any>(filePath);
+      const db = normalizeDb(raw);
       const result = await fn(db);
-      await writeJsonAtomic(filePath, db);
+      await writeJsonAtomic(filePath, normalizeDb(db));
       return result;
     } catch (err) {
       logger.error({ err }, "fileDb update failed");

@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { apiLogout, apiMe } from "../../api/auth";
+import { apiProfile } from "../../api/profile";
+import { useRealtimeStream } from "../../hooks/useRealtimeStream";
+import { GlowCursor } from "../effects/GlowCursor";
+import { ParticlesBackdrop } from "../effects/ParticlesBackdrop";
 import { Button } from "../ui/Button";
 
 function linkClassName(isActive: boolean) {
@@ -12,15 +17,50 @@ function linkClassName(isActive: boolean) {
   ].join(" ");
 }
 
+function resolveMotion(motion: "system" | "on" | "off"): "on" | "off" {
+  if (motion === "on") return "on";
+  if (motion === "off") return "off";
+  const system =
+    typeof window !== "undefined" &&
+    (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false);
+  return system ? "off" : "on";
+}
+
 export function AppShell() {
   const qc = useQueryClient();
   const navigate = useNavigate();
+
+  useRealtimeStream();
 
   const me = useQuery({
     queryKey: ["me"],
     queryFn: apiMe,
     retry: false,
   });
+
+  const profile = useQuery({
+    queryKey: ["profile"],
+    queryFn: apiProfile,
+    enabled: me.isSuccess,
+    retry: false,
+  });
+
+  useEffect(() => {
+    const prefs = profile.data?.preferences;
+    if (!prefs) return;
+    document.documentElement.dataset.theme = prefs.theme;
+    document.documentElement.dataset.motion = resolveMotion(prefs.motion);
+  }, [profile.data?.preferences]);
+
+  const prefs = profile.data?.preferences;
+  const prefersReducedMotion =
+    typeof window !== "undefined" &&
+    (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false);
+  const effectsEnabled = !!prefs && !prefersReducedMotion && resolveMotion(prefs.motion) === "on";
+  const effects = prefs?.effects;
+  const showParticles = effectsEnabled && !!effects?.particles;
+  const showGlowCursor = effectsEnabled && !!effects?.glowCursor;
+  const showAmbientGradient = effectsEnabled && !!effects?.ambientGradient;
 
   const logout = useMutation({
     mutationFn: apiLogout,
@@ -31,8 +71,14 @@ export function AppShell() {
   });
 
   return (
-    <div className="min-h-screen text-[var(--ink)]">
-      <div className="mx-auto flex max-w-7xl gap-6 px-4 py-6 md:px-8">
+    <div className="relative min-h-screen text-[var(--ink)]">
+      {showAmbientGradient ? (
+        <div className="vc-ambient-gradient pointer-events-none fixed inset-0 z-0" />
+      ) : null}
+      {showParticles ? <ParticlesBackdrop /> : null}
+      {showGlowCursor ? <GlowCursor /> : null}
+
+      <div className="relative z-10 mx-auto flex max-w-7xl gap-6 px-4 py-6 md:px-8">
         <aside className="hidden w-64 flex-shrink-0 flex-col gap-6 rounded-3xl border border-[var(--stroke)] bg-[var(--card)]/90 p-6 shadow-[0_20px_50px_var(--shadow)] backdrop-blur md:flex">
           <div>
             <div className="text-2xl font-semibold tracking-tight text-[var(--ink)] font-display">
@@ -45,6 +91,15 @@ export function AppShell() {
           <nav className="flex flex-col gap-2">
             <NavLink to="/dashboard" className={({ isActive }) => linkClassName(isActive)}>
               Dashboard
+            </NavLink>
+            <NavLink to="/profile" className={({ isActive }) => linkClassName(isActive)}>
+              Profile
+            </NavLink>
+            <NavLink to="/problems" className={({ isActive }) => linkClassName(isActive)}>
+              Problems
+            </NavLink>
+            <NavLink to="/rooms" className={({ isActive }) => linkClassName(isActive)}>
+              Rooms
             </NavLink>
             <NavLink to="/wrapped" className={({ isActive }) => linkClassName(isActive)}>
               Wrapped

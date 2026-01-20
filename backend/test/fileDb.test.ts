@@ -23,6 +23,25 @@ describe("fileDb", () => {
           username: `u${i}`,
           passwordHash: "x",
           createdAt: i,
+          stats: {
+            xp: 0,
+            totalSolved: 0,
+            solvedByPlatform: { codeforces: 0, atcoder: 0 },
+            streakDays: 0,
+            achievements: {},
+          },
+          preferences: {
+            theme: "aurora",
+            motion: "system",
+            effects: {
+              particles: true,
+              confetti: true,
+              glowCursor: true,
+              ambientGradient: true,
+              sounds: false,
+            },
+          },
+          favorites: [],
         });
       }),
     );

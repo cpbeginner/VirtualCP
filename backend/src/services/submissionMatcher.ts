@@ -1,15 +1,16 @@
-import type { Contest, SolvedInfo } from "../domain/dbTypes";
+import type { Contest, NormalizedProblem, SolvedInfo } from "../domain/dbTypes";
 import type { AtSubmission } from "../integrations/atcoderProblems";
 import type { CfUserStatusResponse } from "../integrations/codeforces";
 
-export function matchCodeforcesSolved(params: {
-  contest: Contest;
+export function matchCodeforcesSolvedForProblems(params: {
+  problems: NormalizedProblem[];
   startedAt: number;
+  existingSolved: Record<string, SolvedInfo>;
   submissions: CfUserStatusResponse["result"];
 }): Record<string, SolvedInfo> {
-  const { contest, startedAt } = params;
-  const keys = new Set(contest.problems.filter((p) => p.platform === "codeforces").map((p) => p.key));
-  const existing = contest.progress.solved ?? {};
+  const { startedAt } = params;
+  const keys = new Set(params.problems.filter((p) => p.platform === "codeforces").map((p) => p.key));
+  const existing = params.existingSolved ?? {};
 
   const submissions = [...params.submissions].sort(
     (a, b) => a.creationTimeSeconds - b.creationTimeSeconds,
@@ -37,14 +38,15 @@ export function matchCodeforcesSolved(params: {
   return additions;
 }
 
-export function matchAtcoderSolved(params: {
-  contest: Contest;
+export function matchAtcoderSolvedForProblems(params: {
+  problems: NormalizedProblem[];
   startedAt: number;
+  existingSolved: Record<string, SolvedInfo>;
   submissions: AtSubmission[];
 }): Record<string, SolvedInfo> {
-  const { contest, startedAt } = params;
-  const keys = new Set(contest.problems.filter((p) => p.platform === "atcoder").map((p) => p.key));
-  const existing = contest.progress.solved ?? {};
+  const { startedAt } = params;
+  const keys = new Set(params.problems.filter((p) => p.platform === "atcoder").map((p) => p.key));
+  const existing = params.existingSolved ?? {};
 
   const submissions = [...params.submissions].sort((a, b) => a.epoch_second - b.epoch_second);
 
@@ -67,4 +69,30 @@ export function matchAtcoderSolved(params: {
   }
 
   return additions;
+}
+
+export function matchCodeforcesSolved(params: {
+  contest: Contest;
+  startedAt: number;
+  submissions: CfUserStatusResponse["result"];
+}): Record<string, SolvedInfo> {
+  return matchCodeforcesSolvedForProblems({
+    problems: params.contest.problems,
+    startedAt: params.startedAt,
+    existingSolved: params.contest.progress.solved ?? {},
+    submissions: params.submissions,
+  });
+}
+
+export function matchAtcoderSolved(params: {
+  contest: Contest;
+  startedAt: number;
+  submissions: AtSubmission[];
+}): Record<string, SolvedInfo> {
+  return matchAtcoderSolvedForProblems({
+    problems: params.contest.problems,
+    startedAt: params.startedAt,
+    existingSolved: params.contest.progress.solved ?? {},
+    submissions: params.submissions,
+  });
 }

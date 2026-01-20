@@ -336,3 +336,194 @@ This file is an implementation log maintained by Codex per project requirements.
   - `npm -w backend test`
 - Result / issues:
   - Tests pass; builds succeed; stress completes and db.json remains valid.
+
+## Feature 25 - DB + stats/realtime foundation
+
+- Changes:
+  - Extended backend domain models with user `stats/preferences/favorites` and new top-level DB arrays (`rooms`, `roomMessages`, `activities`) in `backend/src/domain/dbTypes.ts`.
+  - Added DB normalization so legacy `db.json` files get missing keys and user defaults persisted in `backend/src/store/fileDb.ts`.
+  - Updated registration to initialize stats/preferences/favorites defaults in `backend/src/routes/auth.ts`.
+  - Added `forbidden()` (403) helper in `backend/src/middleware/errorHandler.ts`.
+  - Added scaffolding services:
+    - `backend/src/services/statsService.ts` (XP/levels + achievements + leaderboard helpers)
+    - `backend/src/services/realtimeHub.ts` (in-memory SSE publish/subscribe)
+  - Wired `statsService` + `realtimeHub` into `backend/src/utils/locals.ts` and `backend/src/app.ts`.
+  - Reset tracked `backend/data/db.json` to an empty baseline with the new keys.
+  - Added `backend/test/dbNormalization.test.ts`.
+- Decisions:
+  - Use `normalizeDb` in both `readDb()` and `updateDb()` so older DB shapes don’t crash and missing keys are persisted on the next write.
+  - Model `stats.achievements` as a sparse map (`Partial<Record<...>>`) to represent “unlocked only” without inventing placeholder values.
+- Commands run:
+  - `npm -w backend test`
+  - `npm -w backend run build`
+- Result / issues:
+  - Backend tests pass and the backend TypeScript build succeeds.
+
+## Feature 26 - Rooms API (backend)
+
+- Changes:
+  - Added room request schemas (`CreateRoomSchema`, `JoinRoomSchema`, `RoomMessageSchema`) in `backend/src/domain/schemas.ts`.
+  - Implemented `backend/src/services/roomService.ts` (invite codes, deterministic problem selection, membership rules, scoreboard).
+  - Added `backend/src/routes/rooms.ts` with create/list/get/join/leave/start/finish endpoints.
+  - Wired `roomService` into `backend/src/utils/locals.ts` and mounted `/api/rooms` in `backend/src/app.ts`.
+  - Added lifecycle test `backend/test/roomsLifecycle.test.ts`.
+- Decisions:
+  - Generate invite codes from the specified 32-char alphabet using `crypto.randomBytes` with unbiased `byte & 31`.
+  - Enforce lobby-only join/leave and host-only start/finish; non-membership/role violations return 403 via `forbidden()`.
+- Commands run:
+  - `npm -w backend test`
+- Result / issues:
+  - Room lifecycle passes in MOCK mode and existing backend tests remain green.
+
+## Feature 27 - Rooms polling + stats on solves (backend)
+
+- Changes:
+  - Refactored submission matching into reusable helpers in `backend/src/services/submissionMatcher.ts` and kept contest behavior unchanged.
+  - Extended `backend/src/services/poller.ts` to:
+    - poll running rooms on the interval tick (after contests, still serialized via the existing `inFlight` guard)
+    - add `pollRoomById` for manual refresh with stats updates per newly-detected solve
+  - Added `POST /api/rooms/:id/refresh` in `backend/src/routes/rooms.ts`.
+  - Updated `backend/src/index.ts` to pass `statsService` into the poller.
+  - Added test `backend/test/roomPollerRefresh.test.ts`.
+- Decisions:
+  - Track AtCoder room polling per-user via `progressByUserId[userId].lastPoll.atFrom` with the same overlap window used for contests to avoid missing delayed results.
+  - Grant XP per newly-added solve event via `statsService.applySolve` (including speed/difficulty bonuses and achievement checks).
+- Commands run:
+  - `npm -w backend test`
+  - `npm -w backend run build`
+- Result / issues:
+  - Manual room refresh updates progress for all members in MOCK mode and backend tests/build pass.
+
+## Feature 28 - Realtime SSE + room chat (backend+frontend)
+
+- Changes:
+  - Added SSE endpoint `GET /api/stream` in `backend/src/routes/stream.ts` (auth required, hello event, keepalive ping) and mounted it in `backend/src/app.ts`.
+  - Extended rooms API with chat/message endpoints in `backend/src/routes/rooms.ts`:
+    - `GET /api/rooms/:id/messages?limit=`
+    - `POST /api/rooms/:id/messages` (stores in `db.roomMessages` and publishes `room_message` to members)
+  - Published realtime events from `backend/src/services/poller.ts`:
+    - `room_update` to room members when new solves are detected
+    - `achievement` to the user when `statsService.applySolve` unlocks achievements
+  - Frontend realtime wiring:
+    - `frontend/src/components/ui/ToastProvider.tsx` (toasts with reduced-motion + motion-off gating)
+    - `frontend/src/hooks/useRealtimeStream.ts` (EventSource + backoff + query invalidation)
+    - hooked into `frontend/src/components/layout/AppShell.tsx` and wrapped app in `ToastProvider` via `frontend/src/main.tsx`
+    - added `vc-toast-in` animation (and motion gating) in `frontend/src/index.css`
+  - Added backend test `backend/test/streamSse.test.ts`.
+- Decisions:
+  - Keep SSE hub in-memory only (no persistence) and rely on react-query invalidations to refresh UI state.
+  - Disable toast/story/page animations when either system reduced-motion is on or `data-motion="off"` is set.
+- Commands run:
+  - `npm -w backend test`
+  - `npm -w frontend run build`
+- Result / issues:
+  - Backend tests pass and frontend builds; SSE handshake is verified by test.
+
+## Feature 29 - Rooms UI + chat (frontend)
+
+- Changes:
+  - Added `frontend/src/api/rooms.ts` covering rooms lifecycle, refresh, and chat message APIs.
+  - Added routes and pages:
+    - `frontend/src/pages/RoomsPage.tsx` (`/rooms`) create/join + rooms list
+    - `frontend/src/pages/RoomPage.tsx` (`/rooms/:id`) room detail + scoreboard + problems + chat
+  - Wired routes in `frontend/src/App.tsx` and added a “Rooms” nav link in `frontend/src/components/layout/AppShell.tsx`.
+  - Added lightweight motion effects for rooms:
+    - scoreboard row flash (`vc-score-flash`)
+    - start countdown overlay (`vc-countdown-pop`)
+    - message pop-in (`vc-chat-in`)
+    - all gated by system reduced-motion and `data-motion="off"` in `frontend/src/index.css`.
+- Decisions:
+  - Rely on SSE-driven react-query invalidations (from `useRealtimeStream`) to keep room state/messages fresh without polling intervals.
+  - Keep animations CSS-only and avoid additional dependencies.
+- Commands run:
+  - `npm -w frontend run build`
+- Result / issues:
+  - Frontend build succeeds with rooms pages and realtime updates via SSE.
+
+## Feature 30 - Profile/Achievements/Leaderboard + preferences (backend+frontend)
+
+- Changes:
+  - Backend:
+    - Added `backend/src/routes/profile.ts` with:
+      - `GET /api/me/profile`
+      - `PATCH /api/me/preferences`
+      - `GET /api/leaderboard?limit=20`
+      - `GET /api/achievements`
+    - Mounted the router in `backend/src/app.ts`.
+    - Added `PatchPreferencesSchema` in `backend/src/domain/schemas.ts`.
+    - Added activity writes (bounded to 5000) for room create/join/start/finish in `backend/src/services/roomService.ts` and room messages/cache refresh in `backend/src/routes/rooms.ts` and `backend/src/routes/cache.ts`.
+    - Cache refresh now unlocks the `cache_refresher` achievement via `statsService.applyCacheRefreshed`.
+    - Added tests: `backend/test/profile.test.ts`, `backend/test/leaderboard.test.ts`.
+  - Frontend:
+    - Added `frontend/src/api/profile.ts`.
+    - Added `frontend/src/pages/ProfilePage.tsx` and route `/profile` + nav link.
+    - Extended `frontend/src/pages/SettingsPage.tsx` with an “Experience” section (theme/motion/effects) saving via `PATCH /api/me/preferences`.
+    - Applied preferences globally in `frontend/src/components/layout/AppShell.tsx` by setting `document.documentElement.dataset.theme` and resolved `data-motion`.
+- Decisions:
+  - Keep preferences application DOM-only (dataset attributes) so CSS can gate animations/effects without extra dependencies.
+  - Store recent activity as a simple bounded append-only list in `db.activities` (no DB, no indexing).
+- Commands run:
+  - `npm -w backend test`
+  - `npm -w frontend run build`
+- Result / issues:
+  - Backend tests pass; frontend builds; profile/leaderboard/preferences endpoints are covered by tests in MOCK mode.
+
+## Feature 31 - Problem explorer + favorites (backend+frontend)
+
+- Changes:
+  - Backend:
+    - Added `backend/src/services/problemIndexService.ts` to build a cached `NormalizedProblem[]` index from cache files (invalidates on `meta.updatedAt` change).
+    - Added `backend/src/routes/problems.ts` with `GET /api/problems/search` (cursor pagination).
+    - Added favorites endpoints in `backend/src/routes/me.ts`:
+      - `GET /api/me/favorites`
+      - `POST /api/me/favorites`
+      - `DELETE /api/me/favorites/:platform/:key`
+    - Wired `problemIndexService` into `backend/src/utils/locals.ts` and `backend/src/app.ts`, and mounted `/api/problems`.
+    - Added tests: `backend/test/problemsSearch.test.ts`, `backend/test/favorites.test.ts`.
+  - Frontend:
+    - Added `frontend/src/api/problems.ts` and `frontend/src/pages/ProblemsPage.tsx` (`/problems`) with search + pagination + favorite toggles and a favorites panel.
+    - Added “Problems” nav link and route.
+    - Added a small favorite pulse animation (`vc-fav-pulse`) with reduced-motion + motion-off gating in `frontend/src/index.css`.
+- Decisions:
+  - Keep search fully cache-backed (no live OJ calls) and paginate with a simple base64 cursor `{ offset }`.
+  - Store favorites as snapshots (name/url/difficulty/tags) so they remain usable even if caches change later.
+- Commands run:
+  - `npm -w backend test`
+  - `npm -w frontend run build`
+- Result / issues:
+  - Backend tests pass and frontend builds; problem search and favorites work in MOCK mode without external traffic.
+
+## Feature 32 - Effects Lab + motion pack (frontend)
+
+- Changes:
+  - Added `frontend/src/pages/EffectsLabPage.tsx` and route `/effects` for previewing motion/effects.
+  - Added theme overrides (`aurora`/`sunset`/`midnight`) and effect animation CSS (shimmer, float, neonPulse) with reduced-motion + `data-motion="off"` gating in `frontend/src/index.css`.
+  - Wired global optional effects in `frontend/src/components/layout/AppShell.tsx`:
+    - particles backdrop
+    - ambient gradient overlay
+    - glow cursor
+- Decisions:
+  - Keep all effects opt-in via `user.preferences.effects` and disable canvas/animations when either system reduced-motion is enabled or user motion is off.
+- Commands run:
+  - `npm -w frontend run build`
+- Result / issues:
+  - Frontend build succeeds; effects are gated by reduced-motion and motion preferences.
+
+## Feature 33 - Stress extension + docs + db baseline reset
+
+- Changes:
+  - Extended `backend/scripts/stress.ts` (MOCK-only) to cover:
+    - two users + `/api/me/profile` validation (`cache_refresher`)
+    - room create/join/start/refresh + chat messages
+    - problem search + favorite/unfavorite flow
+    - added autocannon coverage for rooms/leaderboard/problems endpoints (kept existing contests + wrapped coverage)
+  - Updated `DOCUMENTATION.md` stress notes to match the expanded coverage and added a short `/effects` usage note.
+  - Reset `backend/data/db.json` back to the empty baseline after the stress run.
+- Decisions:
+  - Keep stress safe by forcing `MOCK_OJ=1` and avoiding any external OJ traffic while still exercising the new APIs under load.
+- Commands run:
+  - `npm run test`
+  - `npm run build`
+  - `npm run stress`
+- Result / issues:
+  - Tests pass; build succeeds; stress completes and `db.json` is restored to a clean baseline.

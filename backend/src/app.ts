@@ -7,12 +7,20 @@ import { env } from "./env";
 import { createFileDb } from "./store/fileDb";
 import { createCacheService } from "./services/cacheService";
 import { createContestService } from "./services/contestService";
+import { createRealtimeHub } from "./services/realtimeHub";
+import { createProblemIndexService } from "./services/problemIndexService";
+import { createRoomService } from "./services/roomService";
+import { createStatsService } from "./services/statsService";
 import { createWrappedService } from "./services/wrappedService";
 import { errorHandler } from "./middleware/errorHandler";
 import { authRouter } from "./routes/auth";
 import { meRouter } from "./routes/me";
+import { profileRouter } from "./routes/profile";
 import { cacheRouter } from "./routes/cache";
 import { contestsRouter } from "./routes/contests";
+import { problemsRouter } from "./routes/problems";
+import { roomsRouter } from "./routes/rooms";
+import { streamRouter } from "./routes/stream";
 import { wrappedRouter } from "./routes/wrapped";
 
 export function createApp(overrides?: {
@@ -21,6 +29,10 @@ export function createApp(overrides?: {
   cacheService?: ReturnType<typeof createCacheService>;
   contestService?: ReturnType<typeof createContestService>;
   wrappedService?: ReturnType<typeof createWrappedService>;
+  statsService?: ReturnType<typeof createStatsService>;
+  realtimeHub?: ReturnType<typeof createRealtimeHub>;
+  roomService?: ReturnType<typeof createRoomService>;
+  problemIndexService?: ReturnType<typeof createProblemIndexService>;
 }) {
   const app = express();
 
@@ -44,6 +56,16 @@ export function createApp(overrides?: {
     createContestService({ fileDb: app.locals.fileDb, cacheService: app.locals.cacheService, logger });
   app.locals.wrappedService =
     overrides?.wrappedService ?? createWrappedService({ logger });
+  app.locals.statsService =
+    overrides?.statsService ?? createStatsService({ logger });
+  app.locals.realtimeHub =
+    overrides?.realtimeHub ?? createRealtimeHub();
+  app.locals.roomService =
+    overrides?.roomService ??
+    createRoomService({ fileDb: app.locals.fileDb, cacheService: app.locals.cacheService, logger });
+  app.locals.problemIndexService =
+    overrides?.problemIndexService ??
+    createProblemIndexService({ cacheService: app.locals.cacheService, logger });
 
   app.use(
     pinoHttp({
@@ -63,8 +85,12 @@ export function createApp(overrides?: {
 
   app.use("/api/auth", authRouter);
   app.use("/api/me", meRouter);
+  app.use("/api", profileRouter);
   app.use("/api/cache", cacheRouter);
   app.use("/api/contests", contestsRouter);
+  app.use("/api/problems", problemsRouter);
+  app.use("/api/rooms", roomsRouter);
+  app.use("/api/stream", streamRouter);
   app.use("/api/wrapped", wrappedRouter);
 
   app.use(errorHandler);

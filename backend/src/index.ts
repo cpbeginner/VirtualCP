@@ -13,5 +13,6 @@ createPoller({
   logger: app.locals.logger,
   fileDb: app.locals.fileDb,
   intervalSeconds: env.POLL_INTERVAL_SECONDS,
+  statsService: app.locals.statsService,
+  realtimeHub: app.locals.realtimeHub,
 }).start();
-

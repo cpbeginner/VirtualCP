@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { PatchHandlesSchema } from "../domain/schemas";
+import { FavoriteKeySchema, PatchHandlesSchema } from "../domain/schemas";
 import { fetchAtcoderUserHistory } from "../integrations/atcoderProblems";
 import { fetchCodeforcesUserRating } from "../integrations/codeforces";
 import { requireAuth } from "../middleware/auth";
 import { badRequest, notFound } from "../middleware/errorHandler";
 import { locals } from "../utils/locals";
+import { newId } from "../utils/ids";
 import { nowUnixSeconds } from "../utils/time";
 
 export const meRouter = Router();
@@ -133,6 +134,116 @@ meRouter.get("/ratings", async (req, res, next) => {
     }
 
     res.json({ ok: true, fetchedAt, codeforces, atcoder, warnings });
+  } catch (err) {
+    next(err);
+  }
+});
+
+meRouter.get("/favorites", async (req, res, next) => {
+  try {
+    const userId = req.userId!;
+    const db = await locals(req).fileDb.readDb();
+    const user = db.users.find((u) => u.id === userId);
+    if (!user) return next(notFound("User not found"));
+    res.json({ ok: true, favorites: user.favorites ?? [] });
+  } catch (err) {
+    next(err);
+  }
+});
+
+meRouter.post("/favorites", async (req, res, next) => {
+  const parsed = FavoriteKeySchema.safeParse(req.body);
+  if (!parsed.success) return next(badRequest("Invalid request"));
+
+  try {
+    const { platform, key } = parsed.data;
+    const userId = req.userId!;
+    const index = await locals(req).problemIndexService.getNormalizedIndex();
+    const problem = index.find((p) => p.platform === platform && p.key === key);
+    if (!problem) return next(badRequest("Problem not found"));
+
+    const now = nowUnixSeconds();
+    const favorites = await locals(req).fileDb.updateDb((db) => {
+      const user = db.users.find((u) => u.id === userId);
+      if (!user) throw notFound("User not found");
+      const exists = user.favorites.some((f) => f.platform === platform && f.key === key);
+      if (!exists) {
+        user.favorites.push({
+          platform,
+          key,
+          name: problem.name,
+          url: problem.url,
+          difficulty: problem.difficulty,
+          tags: problem.tags,
+          savedAt: now,
+        });
+
+        const unlocked = locals(req).statsService.applyFavoriteAdded(user, now);
+
+        db.activities.push({
+          id: newId(),
+          t: now,
+          kind: "favorite",
+          actorUserId: userId,
+          target: { type: "user", id: userId },
+          message: `Saved problem "${problem.name}"`,
+          meta: { action: "add", platform, key },
+        });
+        for (const achievementId of unlocked) {
+          db.activities.push({
+            id: newId(),
+            t: now,
+            kind: "achievement",
+            actorUserId: userId,
+            target: { type: "user", id: userId },
+            message: `Unlocked achievement "${achievementId}"`,
+            meta: { achievementId },
+          });
+        }
+        if (db.activities.length > 5000) {
+          db.activities.splice(0, db.activities.length - 5000);
+        }
+      }
+
+      return user.favorites;
+    });
+
+    res.json({ ok: true, favorites });
+  } catch (err) {
+    next(err);
+  }
+});
+
+meRouter.delete("/favorites/:platform/:key", async (req, res, next) => {
+  try {
+    const platform = req.params.platform;
+    if (platform !== "codeforces" && platform !== "atcoder") return next(badRequest("Invalid platform"));
+    const key = req.params.key;
+    const userId = req.userId!;
+    const now = nowUnixSeconds();
+
+    await locals(req).fileDb.updateDb((db) => {
+      const user = db.users.find((u) => u.id === userId);
+      if (!user) throw notFound("User not found");
+      const before = user.favorites.length;
+      user.favorites = user.favorites.filter((f) => !(f.platform === platform && f.key === key));
+      if (user.favorites.length !== before) {
+        db.activities.push({
+          id: newId(),
+          t: now,
+          kind: "favorite",
+          actorUserId: userId,
+          target: { type: "user", id: userId },
+          message: `Removed favorite "${platform}:${key}"`,
+          meta: { action: "remove", platform, key },
+        });
+        if (db.activities.length > 5000) {
+          db.activities.splice(0, db.activities.length - 5000);
+        }
+      }
+    });
+
+    res.json({ ok: true });
   } catch (err) {
     next(err);
   }

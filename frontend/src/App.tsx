@@ -7,7 +7,12 @@ import { ContestPage } from "./pages/ContestPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { ProfilePage } from "./pages/ProfilePage";
+import { ProblemsPage } from "./pages/ProblemsPage";
+import { RoomPage } from "./pages/RoomPage";
+import { RoomsPage } from "./pages/RoomsPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { EffectsLabPage } from "./pages/EffectsLabPage";
 import { WrappedPage } from "./pages/WrappedPage";
 
 export function App() {
@@ -31,7 +36,12 @@ export function App() {
       >
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/contests/:id" element={<ContestPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/problems" element={<ProblemsPage />} />
+        <Route path="/rooms" element={<RoomsPage />} />
+        <Route path="/rooms/:id" element={<RoomPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/effects" element={<EffectsLabPage />} />
         <Route path="/wrapped" element={<WrappedPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

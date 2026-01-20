@@ -1,4 +1,109 @@
 {
-  "users": [],
-  "contests": []
+  "users": [
+    {
+      "id": "082597b5-4748-4dc8-a826-f98a7c03b11d",
+      "username": "kriz_wu",
+      "passwordHash": "$2a$10$OFYpdFg72.gHUPvdUMt2J.MtxI13qwkl.UHGiTAGCtOr2a529dK6O",
+      "cfHandle": "Kriz_Wu",
+      "atcoderUser": "Kriz_Wu",
+      "createdAt": 1768875292,
+      "stats": {
+        "xp": 0,
+        "totalSolved": 0,
+        "solvedByPlatform": {
+          "codeforces": 0,
+          "atcoder": 0
+        },
+        "streakDays": 0,
+        "achievements": {}
+      },
+      "preferences": {
+        "theme": "sunset",
+        "motion": "on",
+        "effects": {
+          "particles": false,
+          "confetti": false,
+          "glowCursor": false,
+          "ambientGradient": false,
+          "sounds": false
+        }
+      },
+      "favorites": []
+    }
+  ],
+  "contests": [
+    {
+      "id": "5bed151c-7b4c-4ed3-8bef-4d30255f1c98",
+      "ownerUserId": "082597b5-4748-4dc8-a826-f98a7c03b11d",
+      "name": "Virtual contest",
+      "status": "created",
+      "createdAt": 1768875460,
+      "durationSeconds": 7200,
+      "seed": "64f5c0fb-e847-4bf7-8206-204b766e97b3",
+      "problems": [
+        {
+          "platform": "atcoder",
+          "key": "abc301_b",
+          "name": "Fill the Gaps",
+          "url": "https://atcoder.jp/contests/abc301/tasks/abc301_b",
+          "difficulty": 600
+        },
+        {
+          "platform": "atcoder",
+          "key": "abc301_a",
+          "name": "Overall Winner",
+          "url": "https://atcoder.jp/contests/abc301/tasks/abc301_a",
+          "difficulty": 200
+        },
+        {
+          "platform": "atcoder",
+          "key": "abc302_b",
+          "name": "Find Snuke",
+          "url": "https://atcoder.jp/contests/abc302/tasks/abc302_b",
+          "difficulty": 700
+        }
+      ],
+      "progress": {
+        "solved": {},
+        "lastPoll": {},
+        "lastSync": {}
+      }
+    }
+  ],
+  "rooms": [],
+  "roomMessages": [],
+  "activities": [
+    {
+      "id": "3b35fea3-b5e9-4d8c-839c-b38bc4f92b3b",
+      "t": 1768875389,
+      "kind": "favorite",
+      "actorUserId": "082597b5-4748-4dc8-a826-f98a7c03b11d",
+      "target": {
+        "type": "user",
+        "id": "082597b5-4748-4dc8-a826-f98a7c03b11d"
+      },
+      "message": "Saved problem \"Overall Winner\"",
+      "meta": {
+        "action": "add",
+        "platform": "atcoder",
+        "key": "abc301_a"
+      }
+    },
+    {
+      "id": "eb853441-3ed5-490d-84f2-124d34958a85",
+      "t": 1768875392,
+      "kind": "favorite",
+      "actorUserId": "082597b5-4748-4dc8-a826-f98a7c03b11d",
+      "target": {
+        "type": "user",
+        "id": "082597b5-4748-4dc8-a826-f98a7c03b11d"
+      },
+      "message": "Removed favorite \"atcoder:abc301_a\"",
+      "meta": {
+        "action": "remove",
+        "platform": "atcoder",
+        "key": "abc301_a"
+      }
+    }
+  ]
 }

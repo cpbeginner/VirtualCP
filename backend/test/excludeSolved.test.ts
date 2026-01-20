@@ -30,6 +30,25 @@ describe("excludeAlreadySolved", () => {
         passwordHash: "x",
         cfHandle: "any",
         createdAt: 0,
+        stats: {
+          xp: 0,
+          totalSolved: 0,
+          solvedByPlatform: { codeforces: 0, atcoder: 0 },
+          streakDays: 0,
+          achievements: {},
+        },
+        preferences: {
+          theme: "aurora",
+          motion: "system",
+          effects: {
+            particles: true,
+            confetti: true,
+            glowCursor: true,
+            ambientGradient: true,
+            sounds: false,
+          },
+        },
+        favorites: [],
       });
     });
 
@@ -64,6 +83,25 @@ describe("excludeAlreadySolved", () => {
         passwordHash: "x",
         atcoderUser: "any",
         createdAt: 0,
+        stats: {
+          xp: 0,
+          totalSolved: 0,
+          solvedByPlatform: { codeforces: 0, atcoder: 0 },
+          streakDays: 0,
+          achievements: {},
+        },
+        preferences: {
+          theme: "aurora",
+          motion: "system",
+          effects: {
+            particles: true,
+            confetti: true,
+            glowCursor: true,
+            ambientGradient: true,
+            sounds: false,
+          },
+        },
+        favorites: [],
       });
     });
 
@@ -80,4 +118,3 @@ describe("excludeAlreadySolved", () => {
     ).rejects.toMatchObject({ status: 400 });
   });
 });
-
